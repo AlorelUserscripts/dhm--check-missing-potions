@@ -1,0 +1,26 @@
+{
+  "name": "dhm-check-pots",
+  "version": "1.0.0",
+  "description": "Checks for missing potions @ DHM",
+  "main": "bundle.js",
+  "repository": "git@github.com:AlorelUserscripts/dhm--check-missing-potions.git",
+  "author": "Alorel <a.molcanovas@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c rollup.config.js"
+  },
+  "dependencies": {
+    "@aloreljs/rxutils": "1.1.0",
+    "lodash-es": "4.17.15",
+    "rxjs": "6.5.3",
+    "tslib": "1.10.0"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.3",
+    "rollup": "^1.21.4",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript2": "^0.24.2",
+    "typescript": "^3.6.3"
+  }
+}
