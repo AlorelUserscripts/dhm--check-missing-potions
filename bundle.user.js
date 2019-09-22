@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DiamondHunt Mobile Potion Checker
 // @namespace    org.alorel.diamondhunt-mobile-potion-checker
-// @version      1.0.1
+// @version      1.0.2
 // @description  Checks if you have missing potions
 // @author       Alorel
 // @include      http*://diamondhunt.app*
@@ -55,8 +55,6 @@
         return r;
     }
 
-    var potionsUlCss = "img {width:1em;height:1em;display:inline-block;margin:0 5px}label{font-weight:bold}";
-
     function observeVar(name) {
         return rxjs.timer(0, 1000).pipe(operators$1.map(function () { return unsafeWindow[name]; }), operators$1.distinctUntilChanged(), operators.logError("[DHMPotionChecker.observeVar(" + name + ")"));
     }
@@ -109,6 +107,7 @@
         var closeBtn = document.createElement('input');
         closeBtn.type = 'button';
         closeBtn.value = 'Close';
+        closeBtn.style.cursor = 'pointer';
         closeBtn.addEventListener('click', function (e) {
             e.preventDefault();
             closeSmittysDialogue("alorel-pot-checker-dialogue" /* DIALOGUE_ID */);
@@ -141,7 +140,7 @@
                 var root = innerContainer.attachShadow({ mode: 'closed' });
                 var label = document.createElement('label');
                 var style = document.createElement('style');
-                style.innerHTML = potionsUlCss;
+                style.innerHTML = 'img{width:1em;height:1em;display:inline-block;margin:0 3px}label{font-weight:normal;cursor:pointer}label>span{margin:3px 0;display:inline-block}`';
                 var cb = document.createElement('input');
                 cb.type = 'checkbox';
                 cb.checked = initialValue.includes(pot);

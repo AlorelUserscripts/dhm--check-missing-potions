@@ -3,7 +3,6 @@ import {logError} from '@aloreljs/rxutils/operators';
 import {startCase} from 'lodash-es';
 import {fromEvent, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map, switchMap, switchMapTo, take, tap} from 'rxjs/operators';
-import potionsUlCss from './css/potionsUl';
 import {getSetting, setSetting} from './settings';
 import {POTS$} from './util/POTS';
 
@@ -25,6 +24,7 @@ function mkMenuDialog(pots: string[] | readonly string[]): HTMLElement {
   const closeBtn = document.createElement('input');
   closeBtn.type = 'button';
   closeBtn.value = 'Close';
+  closeBtn.style.cursor = 'pointer';
   closeBtn.addEventListener('click', e => {
     e.preventDefault();
     closeSmittysDialogue(Conf.DIALOGUE_ID);
@@ -75,7 +75,7 @@ function mkMenuDialog(pots: string[] | readonly string[]): HTMLElement {
           const label = document.createElement('label');
 
           const style = document.createElement('style');
-          style.innerHTML = potionsUlCss;
+          style.innerHTML = 'img{width:1em;height:1em;display:inline-block;margin:0 3px}label{font-weight:normal;cursor:pointer}label>span{margin:3px 0;display:inline-block}`';
 
           const cb = document.createElement('input');
           cb.type = 'checkbox';

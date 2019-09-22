@@ -1,6 +1,6 @@
 {
   "name": "dhm-check-pots",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Checks for missing potions @ DHM",
   "main": "bundle.js",
   "repository": "git@github.com:AlorelUserscripts/dhm--check-missing-potions.git",
