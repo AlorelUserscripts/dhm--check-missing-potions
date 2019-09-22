@@ -55,33 +55,37 @@
         return r;
     }
 
-    var value$ = new rxjs.BehaviorSubject((function () {
-        var raw = GM_getValue("config" /* KEY */) || {};
-        if (typeof raw === 'string') {
-            raw = JSON.parse(raw);
-        }
-        return __assign({ min: 20, pots: [] }, raw);
-    })());
-    value$.pipe(operators$1.skip(1), operators$1.delay(1)).subscribe(function (v) {
-        GM_setValue("config" /* KEY */, __assign({}, v));
-    });
-    function setSetting(k, value) {
-        var _a;
-        if (!lodashEs.isEqual(value, value$.value[k])) {
-            value$.next(__assign(__assign({}, value$.value), (_a = {}, _a[k] = value, _a)));
-        }
-    }
-    function getSetting(k) {
-        return value$.pipe(operators$1.pluck(k), operators.distinctUntilDeepChanged(), operators.logError("[DHMPotionChecker.getSetting(" + k + ")"));
-    }
-
-    var potionsUlCss = "img {width:1em;height:1em;display:inline-block;margin:0 5px}label{font-weight:bold}";
-
     function observeVar(name) {
         return rxjs.timer(0, 1000).pipe(operators$1.map(function () { return unsafeWindow[name]; }), operators$1.distinctUntilChanged(), operators.logError("[DHMPotionChecker.observeVar(" + name + ")"));
     }
 
     var onLoggedIn$ = observeVar('username').pipe(operators.takeTruthy(1), operators$1.delay(1000), operators$1.mapTo(undefined), operators.logError('[DHMPotionChecker.onLoggedIn$]'), operators$1.shareReplay());
+
+    var READY$ = onLoggedIn$
+        .pipe(operators$1.tap(function () {
+        var raw = GM_getValue(unsafeWindow.username) || {};
+        if (typeof raw === 'string') {
+            raw = JSON.parse(raw);
+        }
+        value$ = new rxjs.BehaviorSubject(__assign({ min: 20, pots: [] }, raw));
+        value$.pipe(operators$1.skip(1), operators$1.delay(1)).subscribe(function (v) {
+            GM_setValue(unsafeWindow.username, __assign({}, v));
+        });
+    }), operators$1.mapTo(undefined), operators.logError('[DHMPotionChecker.settingsInit]'), operators$1.shareReplay());
+    var value$;
+    function setSetting(k, value) {
+        READY$.subscribe(function () {
+            var _a;
+            if (!lodashEs.isEqual(value, value$.value[k])) {
+                value$.next(__assign(__assign({}, value$.value), (_a = {}, _a[k] = value, _a)));
+            }
+        });
+    }
+    function getSetting(k) {
+        return READY$.pipe(operators$1.switchMap(function () { return value$; }), operators$1.pluck(k), operators.distinctUntilDeepChanged(), operators.logError("[DHMPotionChecker.getSetting(" + k + ")"));
+    }
+
+    var potionsUlCss = "img {width:1em;height:1em;display:inline-block;margin:0 5px}label{font-weight:bold}";
 
     var POTS$ = onLoggedIn$.pipe(operators$1.map(function () { return Array.from(document.querySelectorAll('[id$="Potion"]')); }), operators$1.map(function (elements) {
         var reg = /^item-box-([a-zA-Z]+Potion)$/;
@@ -202,17 +206,17 @@
     POTS$.pipe(operators$1.tap(mkMenuDialog), operators.logError('[DHMPotionChecker.mkMenuDialog]'), operators$1.tap(mkMenuElement), operators.logError('[DHMPotionChecker.mkMenuElement]')).subscribe(rxutils.NOOP_OBSERVER);
 
     function mkPotionDiv(potion) {
+        var displayedPotion = lodashEs.startCase(potion);
         var div = document.createElement('div');
         div.classList.add('notification-idle');
         div.style.display = 'none';
-        div.setAttribute('data-potion', potion);
+        div.title = displayedPotion;
         var img = document.createElement('img');
         img.src = "/images/" + potion + ".png";
         img.classList.add('img-small');
         var txt = document.createElement('span');
-        txt.innerText = ' ??';
+        txt.innerText = '??';
         div.append(img, txt);
-        var displayedPotion = lodashEs.startCase(potion);
         getSetting('min')
             .pipe(operators$1.switchMap(function (min) {
             return getSetting('pots').pipe(operators$1.map(function (enabledPots) { return enabledPots.includes(potion); }), operators$1.distinctUntilChanged(), operators$1.switchMap(function (potionEnabled) {
@@ -234,7 +238,7 @@
             }
             else {
                 div.style.display = null;
-                txt.innerText = " " + v;
+                txt.innerText = v.toString();
             }
         }), operators.logError("[DHMPotionchecker.monitor(" + potion + ")]"))
             .subscribe(rxutils.NOOP_OBSERVER);
