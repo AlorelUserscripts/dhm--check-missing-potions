@@ -3,6 +3,8 @@ import typescript from 'rollup-plugin-typescript2';
 import * as fs from 'fs';
 import {join} from 'path';
 
+const VERSYNC_PATH = require.resolve('./versync');
+
 const globals = {
   rxjs: 'rxjs',
   'rxjs/operators': ['rxjs.operators'],
@@ -16,7 +18,12 @@ export default {
   input: 'src/index.ts',
   external: Object.keys(globals),
   output: {
-    banner: () => fs.readFileSync(join(__dirname, 'bundle.meta.js'), 'utf8'),
+    banner: () => {
+      require(VERSYNC_PATH);
+      delete require.cache[VERSYNC_PATH];
+
+      return fs.readFileSync(join(__dirname, 'bundle.meta.js'), 'utf8');
+    },
     file: 'bundle.user.js',
     format: 'iife',
     globals

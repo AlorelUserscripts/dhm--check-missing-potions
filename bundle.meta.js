@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DiamondHunt Mobile Potion Checker
 // @namespace    org.alorel.diamondhunt-mobile-potion-checker
-// @version      1.0.0
+// @version      1.0.1
 // @description  Checks if you have missing potions
 // @author       Alorel
 // @include      http*://diamondhunt.app*

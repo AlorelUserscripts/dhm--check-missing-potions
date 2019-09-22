@@ -1,10 +1,10 @@
 import {NOOP_OBSERVER} from '@aloreljs/rxutils';
 import {logError} from '@aloreljs/rxutils/operators';
 import {startCase} from 'lodash-es';
-import {fromEvent, merge, Observable} from 'rxjs';
+import {fromEvent, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map, switchMap, switchMapTo, take, tap} from 'rxjs/operators';
-import {getSetting, setSetting} from './settings';
 import potionsUlCss from './css/potionsUl';
+import {getSetting, setSetting} from './settings';
 import {POTS$} from './util/POTS';
 
 const enum Conf {
@@ -40,10 +40,7 @@ function mkMenuDialog(pots: string[] | readonly string[]): HTMLElement {
       switchMap((v): Observable<Event> => {
         valueInp.value = typeof <any>v === 'number' ? v.toString() : '5';
 
-        return merge(
-          fromEvent(valueInp, 'input', {passive: true}),
-          fromEvent(valueInp, 'input', {passive: true})
-        );
+        return fromEvent(valueInp, 'input', {passive: true});
       }),
       map(() => (valueInp.value || '').trim()),
       distinctUntilChanged(),
@@ -158,6 +155,7 @@ function mkMenuElement(): HTMLElement {
   menuElement.addEventListener(
     'click',
     () => {
+      closeSmittysDialogue('dialogue-profile');
       openDialogue(Conf.DIALOGUE_ID, '90%');
     },
     {passive: true}

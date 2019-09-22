@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DiamondHunt Mobile Potion Checker
 // @namespace    org.alorel.diamondhunt-mobile-potion-checker
-// @version      1.0.0
+// @version      1.0.1
 // @description  Checks if you have missing potions
 // @author       Alorel
 // @include      http*://diamondhunt.app*
@@ -55,6 +55,8 @@
         return r;
     }
 
+    var potionsUlCss = "img {width:1em;height:1em;display:inline-block;margin:0 5px}label{font-weight:bold}";
+
     function observeVar(name) {
         return rxjs.timer(0, 1000).pipe(operators$1.map(function () { return unsafeWindow[name]; }), operators$1.distinctUntilChanged(), operators.logError("[DHMPotionChecker.observeVar(" + name + ")"));
     }
@@ -84,8 +86,6 @@
     function getSetting(k) {
         return READY$.pipe(operators$1.switchMap(function () { return value$; }), operators$1.pluck(k), operators.distinctUntilDeepChanged(), operators.logError("[DHMPotionChecker.getSetting(" + k + ")"));
     }
-
-    var potionsUlCss = "img {width:1em;height:1em;display:inline-block;margin:0 5px}label{font-weight:bold}";
 
     var POTS$ = onLoggedIn$.pipe(operators$1.map(function () { return Array.from(document.querySelectorAll('[id$="Potion"]')); }), operators$1.map(function (elements) {
         var reg = /^item-box-([a-zA-Z]+Potion)$/;
@@ -120,7 +120,7 @@
         getSetting('min')
             .pipe(operators$1.take(1), operators$1.switchMap(function (v) {
             valueInp.value = typeof v === 'number' ? v.toString() : '5';
-            return rxjs.merge(rxjs.fromEvent(valueInp, 'input', { passive: true }), rxjs.fromEvent(valueInp, 'input', { passive: true }));
+            return rxjs.fromEvent(valueInp, 'input', { passive: true });
         }), operators$1.map(function () { return (valueInp.value || '').trim(); }), operators$1.distinctUntilChanged(), operators$1.filter(function (v) { return !isNaN(v); }), operators$1.tap(function (v) {
             setSetting('min', parseInt(v));
         }), operators.logError('[DHMPotionChecker.menuDialogInit]'))
@@ -196,6 +196,7 @@
         textTd.style.paddingRight = '20px';
         tr.append(imgTd, textTd);
         menuElement.addEventListener('click', function () {
+            closeSmittysDialogue('dialogue-profile');
             openDialogue("alorel-pot-checker-dialogue" /* DIALOGUE_ID */, '90%');
         }, { passive: true });
         menuElement.appendChild(tbl);
